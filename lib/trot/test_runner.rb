@@ -12,6 +12,7 @@ class Trot
       @io = io
       @already_outputted = false
       @faults = []
+      @index = 0
     end
     
     def start
@@ -21,6 +22,18 @@ class Trot
     end
     
     private
+    
+    def size
+      @size ||= @suite.tests.inject(0) do |total, suite|
+        suite.tests.each do |test|
+          total += 1 unless test.method_name == 'default_test'
+        end; total
+      end
+    end
+    
+    def index!
+      @index += 1
+    end
     
     def setup_mediator
       @mediator = TestRunnerMediator.new(@suite)
@@ -38,36 +51,33 @@ class Trot
       @mediator.run_suite
     end
     
-    def add_fault(fault)
-      @faults << fault
-      output_single(fault.single_character_display, PROGRESS_ONLY)
-      @already_outputted = true
-    end
-    
     def started(result)
       @result = result
-      output("Started")
-    end
-    
-    def finished(elapsed_time)
-      nl
-      output("Finished in #{elapsed_time} seconds.")
-      @faults.each_with_index do |fault, index|
-        nl
-        output("%3d) %s" % [index + 1, fault.long_display])
-      end
-      nl
-      output(@result)
+      output("1..#{size}")
     end
     
     def test_started(name)
-      output_single(name + ": ", VERBOSE)
+    end
+    
+    def add_fault(fault)
+      @faults << fault
+      output_single("not ok #{index!} – #{fault.short_display}", PROGRESS_ONLY)
+      @already_outputted = true
     end
     
     def test_finished(name)
-      output_single(".", PROGRESS_ONLY) unless (@already_outputted)
-      nl(VERBOSE)
+      output("ok #{index!}", PROGRESS_ONLY) unless (@already_outputted)
       @already_outputted = false
+    end
+    
+    def finished(elapsed_time)
+      output("# Finished in #{elapsed_time} seconds.")
+      # @faults.each_with_index do |fault, index|
+      #   nl
+      #   output("%3d) %s" % [index + 1, fault.long_display])
+      # end
+      # nl
+      output("# #{@result}")
     end
     
     def nl(level=NORMAL)
