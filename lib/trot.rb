@@ -7,7 +7,7 @@ class Trot
       load testfile
     end
     
-    runner = Test::Unit::AutoRunner.new(true)
+    runner = Test::Unit::AutoRunner.new(false)
     runner.runner = proc do |r|
       require 'trot/test_runner'
       Trot::TestRunner

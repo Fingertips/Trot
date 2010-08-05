@@ -5,45 +5,27 @@ class Trot
   class TestRunner
     extend Test::Unit::UI::TestRunnerUtilities
     include Test::Unit::UI
-    # Creates a new TestRunner for running the passed
-    # suite. If quiet_mode is true, the output while
-    # running is limited to progress dots, errors and
-    # failures, and the final result. io specifies
-    # where runner output should go to; defaults to
-    # STDOUT.
+    
     def initialize(suite, output_level=NORMAL, io=STDOUT)
-      if (suite.respond_to?(:suite))
-        @suite = suite.suite
-      else
-        @suite = suite
-      end
+      @suite = suite.respond_to?(:suite) ? suite.suite : suite
       @output_level = output_level
       @io = io
       @already_outputted = false
       @faults = []
     end
     
-    # Begins the test run.
     def start
       setup_mediator
       attach_to_mediator
-      return start_mediator
+      start_mediator
     end
     
     private
+    
     def setup_mediator
-      @mediator = create_mediator(@suite)
-      suite_name = @suite.to_s
-      if ( @suite.kind_of?(Module) )
-        suite_name = @suite.name
-      end
-      output("Loaded suite #{suite_name}")
+      @mediator = TestRunnerMediator.new(@suite)
     end
-    
-    def create_mediator(suite)
-      return TestRunnerMediator.new(suite)
-    end
-    
+        
     def attach_to_mediator
       @mediator.add_listener(Test::Unit::TestResult::FAULT, &method(:add_fault))
       @mediator.add_listener(TestRunnerMediator::STARTED, &method(:started))
@@ -53,7 +35,7 @@ class Trot
     end
     
     def start_mediator
-      return @mediator.run_suite
+      @mediator.run_suite
     end
     
     def add_fault(fault)
