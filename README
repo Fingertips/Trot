@@ -1,3 +1,16 @@
 = TROT
 
   ‘When running has devolved into a trot…
+
+Testing is basically an embarrassingly parallel problem, but in reality we don't take advantage of this. Trot aims to solve this problem using the Test Anything Protocol. Trot takes a bag of TAP producers, runs them and either becomes a TAP producer itself or formats the output. This allows you to run all of your tests in parallel as long as they're a TAP producer.
+
+== Example architecture
+
+ python tests --TAP--.
+                      \
+ ruby tests --TAP-------> Trot -----.
+                      /              \
+ C tests --TAP-------'                \
+                                       -----> Trot => Formatted goodness
+                                      /
+ remote tests --TAP--NETCAT--> Trot -'
