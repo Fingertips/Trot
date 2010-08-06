@@ -1,6 +1,9 @@
 require 'option_parser'
 
-class Trot
+module Trot
+  autoload :Tap,        'trot/tap'
+  autoload :TestRunner, 'trot/test_runner'
+  
   def self.run(argv)
     options, argv = OptionParser.parse(argv)
     [options['r']].flatten.compact.each do |testfile|

@@ -1,7 +1,7 @@
 require 'test/unit/ui/testrunnermediator'
 require 'test/unit/ui/testrunnerutilities'
 
-class Trot
+module Trot
   class TestRunner
     extend Test::Unit::UI::TestRunnerUtilities
     include Test::Unit::UI
